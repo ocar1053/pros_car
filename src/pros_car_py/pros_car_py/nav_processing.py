@@ -92,7 +92,7 @@ class Nav2Processing:
                 self.recordFlag = 1
                 action_key = "STOP"
 
-        car_position, car_orientation = self.data_processor.get_processed_amcl_pose()
+        car_position, car_orientation = self.data_processor.get_processed_gps_pose()
 
         goal_position = self.ros_communicator.get_latest_goal()
         target_distance = cal_distance(car_position, goal_position)
@@ -120,7 +120,7 @@ class Nav2Processing:
     def check_data_availability(self):
         return (
             self.data_processor.get_processed_received_global_plan_no_dynamic()
-            and self.data_processor.get_processed_amcl_pose()
+            and self.data_processor.get_processed_gps_pose()
             and self.ros_communicator.get_latest_goal()
         )
 

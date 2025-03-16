@@ -14,13 +14,32 @@ from visualization_msgs.msg import Marker
 from nav2_msgs.srv import ClearEntireCostmap
 from rclpy.action import ActionClient
 from nav2_msgs.action import NavigateToPose
+from sensor_msgs.msg import Imu
+from nav_msgs.msg import Odometry
 import rclpy
 
 
 class RosCommunicator(Node):
     def __init__(self):
         super().__init__("RosCommunicator")
-
+        
+        #subscribe orientaion_gps
+        self.latest_android_orienation = None
+        self.subscribe_android_orienation = self.create_subscription(
+            Imu,              
+            '/imu/data',     
+            self.android_orienation_callback,  
+            10               
+        )
+        
+        #subscribe to /odometry/global
+        self.latest_android_position = None
+        self.subscribe_android_position = self.create_subscription(
+            Odometry,
+            '/odometry/global',
+            self.android_position_callback,
+            10
+        )
         # subscribeamcl_pose
         self.latest_amcl_pose = None
         self.subscriber_amcl = self.create_subscription(
@@ -30,7 +49,7 @@ class RosCommunicator(Node):
         # subscribe goal_pose
         self.target_pose = None
         self.subscriber_goal = self.create_subscription(
-            PoseStamped, "/goal_pose", self.subscriber_goal_callback, 1
+            PoseStamped, "/gps_goal_pose", self.subscriber_goal_callback, 1
         )
 
         # subscribe lidar
@@ -172,11 +191,26 @@ class RosCommunicator(Node):
         self.clear_received_global_plan()
         self.clear_plan()
         self.get_logger().info("Nav2 Reset Completed")
-
+    def android_position_callback(self, msg):
+      
+        self.latest_android_position = msg   
+    def android_orienation_callback(self, msg):
+   
+        self.latest_android_orienation = msg
     # amcl_pose callback and get_latest_amcl_pose
     def subscriber_amcl_callback(self, msg):
         self.latest_amcl_pose = msg
-
+        
+    def get_latest_gps_pose(self):
+        if self.latest_android_position is None:
+            self.get_logger().warn("No android_position data received yet.")
+        return self.latest_android_position
+        
+    def get_latest_android_orientation(self):
+        if self.latest_android_orienation is None:
+            self.get_logger().warn("No android_orientation received yet.")
+        
+        return self.latest_android_orienation    
     def get_latest_amcl_pose(self):
         if self.latest_amcl_pose is None:
             self.get_logger().warn("No AMCL pose data received yet.")

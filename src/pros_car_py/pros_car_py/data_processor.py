@@ -13,7 +13,28 @@ RIGHT_LIDAR_INDICES = list(range(-45, -15))  # right lidar indices
 class DataProcessor:
     def __init__(self, ros_communicator):
         self.ros_communicator = ros_communicator
+    def get_processed_gps_pose(self):
+        
+        gps_pose_msg = self.ros_communicator.get_latest_gps_pose()
+        android_orientation_msg = self.ros_communicator.get_latest_android_orientation()
 
+        
+        position = gps_pose_msg.pose.pose.position  # geometry_msgs/Point
+        pose = [position.x, position.y, position.z]
+
+   
+        orientation = android_orientation_msg.orientation  # geometry_msgs/Quaternion
+        quaternion = [
+            orientation.x,
+            orientation.y,
+            orientation.z,
+            orientation.w
+        ]
+
+        
+        
+        return pose, quaternion
+    
     def get_processed_amcl_pose(self):
         amcl_pose_msg = self.ros_communicator.get_latest_amcl_pose()
         position = amcl_pose_msg.pose.pose.position
