@@ -23,7 +23,7 @@ class DataProcessor:
         pose = [position.x, position.y, position.z]
 
    
-        orientation = android_orientation_msg.orientation  # geometry_msgs/Quaternion
+        orientation = gps_pose_msg.pose.pose.orientation  # geometry_msgs/Quaternion
         quaternion = [
             orientation.x,
             orientation.y,

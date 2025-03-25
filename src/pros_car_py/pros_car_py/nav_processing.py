@@ -109,12 +109,17 @@ class Nav2Processing:
         diff_angle = self.calculate_diff_angle(
             car_position, car_orientation, target_x, target_y
         )
+        
+        print(diff_angle)
+        
         if diff_angle < 20 and diff_angle > -20:
             action_key = "FORWARD"
         elif diff_angle < -20 and diff_angle > -180:
             action_key = "CLOCKWISE_ROTATION"
         elif diff_angle > 20 and diff_angle < 180:
             action_key = "COUNTERCLOCKWISE_ROTATION"
+            
+        
         return action_key
 
     def check_data_availability(self):
